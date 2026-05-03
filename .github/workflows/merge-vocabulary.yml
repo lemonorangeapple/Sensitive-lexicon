@@ -1,0 +1,41 @@
+name: Merge Vocabulary Files
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # 每周一运行
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  merge-vocabulary:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up environment
+      run: |
+        echo "Setting up environment..."
+        echo "Merging files..."
+        mkdir -p merged
+
+    - name: Merge vocabulary files
+      run: |
+        echo "Merging vocabulary files..."
+        ls Vocabulary/*.txt > /dev/null 2>&1 || echo "No Vocabulary files found"
+        touch merged.txt
+        for file in Vocabulary/*.txt; do
+          cat $file >> merged.txt
+        done
+        echo "Files merged successfully."
+
+    - name: Upload merged file
+      uses: actions/upload-artifact@v3
+        with:
+          name: merged-vocabulary
+          path: merged.txt
